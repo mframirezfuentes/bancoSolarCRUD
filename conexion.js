@@ -2,35 +2,33 @@ const {
     Pool
 } = require('pg')
 
-const config = {
-    user: 'postgres',
-    password: '1234',
+const pool = new Pool({
+    user: "postgres",
+    host: "localhost",
+    password: "1234",
     port: 5432,
-    host: 'localhost',
-    database: 'bancosolar',
-    max: 20,
-    min: 2,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    database: "bancosolar"
+
+})
+
+const insertar = async (datos) => {
+    const consulta = {
+        text: `INSERT INTO usuarios(nombre,balance) values($1,$2)`,
+        values: datos,
+    }
+    try {
+        const result = await pool.query(consulta)
+        return result
+    } catch (error) {
+        console.log(error.code)
+        return error
+    }
+
+}
+const consultar = async () => {
+const
 }
 
-const pool= new Pool(config)
-
-const insertar= async(datos)=>{
-    pool.connect((error_conexion,client,release)=>{
-        if(error_conexion)return console.log(error_conexion.code)
-        try {
-            const consulta={
-                text:`INSERT INTO usuarios values((select max(id)+1 from usuarios),$1,)`,
-                value: datos
-
-            }
-            
-        } catch (error) {
-            console.log(error.code)
-            return error
-            
-        }
-
-    })
+module.exports = {
+    insertar
 }
