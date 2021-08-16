@@ -4,7 +4,7 @@ const url = require('url')
 const {
     insertar,
     consultar,
-    editar
+    editar,eliminar
 } = require('./conexion')
 
 
@@ -35,15 +35,19 @@ http.createServer(async (req, res) => {
     }
     if (req.url == '/usuario' && req.method == 'PUT') {
         let body = "";
-        console.log('body', body)
         req.on('data', (chunk) => {
             body += chunk
         })
         req.on('end', async () => {
-            const datos = Object.values(JSON.parse(body))
-            console.log(datos)
+            const datos = Object.values(JSON.parse(body))      
             const respuesta = await editar(datos)
             res.end(JSON.stringify(respuesta))
         })
+    }
+    if(req.url.startsWith('/usuario')&&req.method=='DELETE'){
+        const {id}= url.parse(req.url,true).query
+        const respuesta=await eliminar(id)
+        res.end(JSON.stringify(respuesta))
+
     }
 }).listen(3000, () => console.log('Servidor encendido'))
