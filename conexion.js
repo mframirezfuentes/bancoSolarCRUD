@@ -34,7 +34,23 @@ const consultar = async () => {
         return error
     }
 }
+const editar = async (datos) => {
+    const consulta = {
+        text: `UPDATE usuarios SET nombre=$2, balance=$3 where id=$1 RETURNING *;`,
+        values: datos,
+    }
+    try {      
+        const result = await pool.query(consulta)
+        return result
+
+    } catch (error) {
+        console.log(error.code)
+        return error
+    }
+}
 
 module.exports = {
-    insertar,consultar
+    insertar,
+    consultar,
+    editar
 }
