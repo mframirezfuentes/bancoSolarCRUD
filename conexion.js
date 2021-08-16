@@ -26,9 +26,15 @@ const insertar = async (datos) => {
 
 }
 const consultar = async () => {
-const
+    try {
+        const result = await (await pool.query("select * from usuarios order by id asc")).rows;
+        return result;
+    } catch (error) {
+        console.log(error.code)
+        return error
+    }
 }
 
 module.exports = {
-    insertar
+    insertar,consultar
 }
