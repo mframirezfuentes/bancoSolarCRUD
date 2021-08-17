@@ -4,7 +4,10 @@ const url = require('url')
 const {
     insertar,
     consultar,
-    editar,eliminar
+    editar,
+    eliminar,
+    transferencia,
+    consultarTransferencia
 } = require('./conexion')
 
 
@@ -39,15 +42,32 @@ http.createServer(async (req, res) => {
             body += chunk
         })
         req.on('end', async () => {
-            const datos = Object.values(JSON.parse(body))      
+            const datos = Object.values(JSON.parse(body))
             const respuesta = await editar(datos)
             res.end(JSON.stringify(respuesta))
         })
     }
-    if(req.url.startsWith('/usuario')&&req.method=='DELETE'){
-        const {id}= url.parse(req.url,true).query
-        const respuesta=await eliminar(id)
+    if (req.url.startsWith('/usuario') && req.method == 'DELETE') {
+        const {
+            id
+        } = url.parse(req.url, true).query
+        const respuesta = await eliminar(id)
         res.end(JSON.stringify(respuesta))
 
+    }
+    if (req.url == "/transferencia" && req.method == "POST") {
+        let body = '';
+        req.on('data', (chunk) => {
+            body += chunk
+        })
+        req.on('end', async () => {
+            const datos = Object.values(JSON.parse(body))       
+            const respuesta = await transferencia(datos)
+            res.end(JSON.stringify(respuesta))
+        })
+    }
+    if (req.url == '/transferencias' && req.method === 'GET') {
+        const registros = await consultarTransferencia();
+        res.end(JSON.stringify(registros))
     }
 }).listen(3000, () => console.log('Servidor encendido'))
