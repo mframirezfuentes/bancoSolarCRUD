@@ -61,30 +61,29 @@ const eliminar = async (id) => {
 
 }
 const transferencia = async (datos) => {
-console.log("datos",datos)
+
     const consulta = {
         text: "INSERT INTO transferencias(emisor,receptor,monto,fecha) values((select id from usuarios where nombre =$1),(select id from usuarios where nombre =$2),$3,CURRENT_TIMESTAMP)",
         values: [datos[0], datos[1], Number(datos[2])]
-    }
+    } 
     const acreditarEmisor = {
-        text: `UPDATE usuarios SET balance= balance- $3 where nombre=$1`,
-        values: [datos[0], datos[1], Number(datos[2])]
+        text: "UPDATE usuarios SET balance= balance- $2 where nombre=$1",
+        values: [datos[0], Number(datos[2])]
     } 
     const acreditarReceptor = {
-        text: `UPDATE usuarios SET balance= balance -$3 where nombre=$2`,
-        values: [datos[0], datos[1], Number(datos[2])]
+        text: "UPDATE usuarios SET balance= balance +$2 where nombre=$1",
+        values:[datos[1], Number(datos[2])]
     }
     try {
-
-        /* await pool.query('BEGIN') */
-        const result = await pool.query(consulta).rows
-       /*  await pool.query(acreditarEmisor).rows
-        await pool.query(acreditarReceptor).rows
-        await pool.query('COMMIT')
-        await pool.query('ROLLBACK') */
-        return result
+        await pool.query('BEGIN')
+        const result = (await pool.query(consulta))             
+        await pool.query(acreditarEmisor)
+        await pool.query(acreditarReceptor)
+        await pool.query('COMMIT')       
+        return true       
 
     } catch (error) {
+        await pool.query('ROLLBACK')
         console.log("Error código: " + error.code);
         console.log("Detalle del error: " + error.detail);
         console.log("Tabla originaria del error: " + error.table);
@@ -104,8 +103,7 @@ const consultarTransferencia = async () => {
     }
     try {
 
-        const result = (await pool.query(consulta))
-
+        const result = await pool.query(consulta)
         return result
     } catch (error) {
         console.log(error.code)

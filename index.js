@@ -61,8 +61,10 @@ http.createServer(async (req, res) => {
             body += chunk
         })
         req.on('end', async () => {
+            console.log('b',body)
             const datos = Object.values(JSON.parse(body))
-            const respuesta = await transferencia(datos)
+            console.log('d',datos)            
+            const respuesta = await transferencia(datos)           
             res.end(JSON.stringify(respuesta))
         })
     }
